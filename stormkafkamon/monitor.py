@@ -39,23 +39,6 @@ def display(summary, friendly=False):
     print 'Total broker depth:      %s' % fmt(summary.total_depth)
     print 'Total delta:             %s' % fmt(summary.total_delta)
 
-def post_json(endpoint, zk_data):
-    fields = ("broker", "topic", "partition", "earliest", "latest", "depth",
-              "spout", "current", "delta")
-    json_data = {"%s-%s" % (p.broker, p.partition):
-                 {name: getattr(p, name) for name in fields}
-                 for p in zk_data.partitions}
-    total_fields = ('depth', 'delta')
-    total = {fieldname:
-             sum(getattr(p, fieldname) for p in zk_data.partitions)
-             for fieldname in total_fields}
-    total['partitions'] = len({p.partition for p in zk_data.partitions})
-    total['brokers'] = len({p.broker for p in zk_data.partitions})
-    json_data['total'] = total
-    requests.post(endpoint, data=json.dumps(json_data))
-
-######################################################################
-
 def true_or_false_option(option):
     if option == None:
         return False
@@ -93,10 +76,7 @@ def main():
         print 'Failed to process: %s' % str(e)
         return 1
     else:
-        if options.postjson:
-            post_json(options.postjson, zk_data)
-        else:
-            display(zk_data, true_or_false_option(options.friendly))
+        display(zk_data, true_or_false_option(options.friendly))
 
     return 0
 

@@ -4,7 +4,7 @@ from collections import namedtuple
 from kazoo.client import KazooClient
 from kazoo.exceptions import NoNodeError
 
-ZkKafkaBroker = namedtuple('ZkKafkaBroker', ['id', 'host', 'port'])
+ZkKafkaBroker = namedtuple('ZkKafkaBroker', ['host', 'port'])
 ZkKafkaSpout = namedtuple('ZkKafkaSpout', ['id', 'partitions'])
 ZkKafkaTopic = namedtuple('ZkKafkaTopic', ['topic', 'broker', 'num_partitions'])
 
@@ -71,12 +71,9 @@ class ZkClient:
         self.client.start()
         try:
             for c in self.client.get_children(spout_root):
-                partitions = []
-                for p in self.client.get_children(self._zjoin([spout_root, c])):
-                    j = json.loads(self.client.get(self._zjoin([spout_root, c, p]))[0])
-                    if j['topology']['name'] == topology:
-                        partitions.append(j)
-                s.append(ZkKafkaSpout._make([c, partitions]))
+                j = json.loads(self.client.get(self._zjoin([spout_root, c]))[0], encoding='utf-8')
+                if j['topology']['name'] == topology:
+                    s.append(ZkKafkaSpout._make([c, [j]]))
         except NoNodeError:
             raise ZkError('Kafka Spout nodes do not exist in Zookeeper')
         self.client.stop()
