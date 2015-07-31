@@ -13,12 +13,12 @@ install_requires = [
 
 setuptools.setup(
     name = 'stormkafkamon',
-    version = '0.1.0',
+    version = '0.1.1',
     license = 'Apache',
     description = '''Monitor offsets of a storm kafka spout.''',
     author = "Philip O'Toole",
     author_email = 'philipomailbox-github@yahoo.com',
-    url = 'https://github.com/otoolep/stormkafkamon',
+    url = 'https://github.com/vivekrao1985/stormkafkamon',
     platforms = 'any',
     packages = ['stormkafkamon'],
     zip_safe = True,
